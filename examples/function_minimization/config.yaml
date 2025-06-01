@@ -1,9 +1,9 @@
-# Configuration for function minimization example
+# 函数最小化示例的配置
 max_iterations: 100
 checkpoint_interval: 10
 log_level: "INFO"
 
-# LLM configuration
+# LLM配置
 llm:
   # primary_model: "gemini-2.0-flash-lite"
   primary_model: "llama3.1-8b"
@@ -17,13 +17,20 @@ llm:
   top_p: 0.95
   max_tokens: 4096
 
-# Prompt configuration
+# 提示配置
 prompt:
-  system_message: "You are an expert programmer specializing in optimization algorithms. Your task is to improve a function minimization algorithm to find the global minimum of a complex function with many local minima. The function is f(x, y) = sin(x) * cos(y) + sin(x*y) + (x^2 + y^2)/20. Focus on improving the search_algorithm function to reliably find the global minimum, escaping local minima that might trap simple algorithms."
+  system_message: |
+    你是一位专门研究优化算法的专家程序员.
+    你的任务是改进一个函数最小化算法,
+    以找到一个具有许多局部最小值的复杂函数的全局最小值.
+    该函数是 f(x, y) = sin(x) * cos(y) + sin(x*y) + (x^2 + y^2)/20.
+    重点改进 search_algorithm 函数,
+    使其能够可靠地找到全局最小值,
+    避免简单算法可能陷入的局部最小值.
   num_top_programs: 3
   use_template_stochasticity: true
 
-# Database configuration
+# 数据库配置
 database:
   population_size: 50
   archive_size: 20
@@ -31,7 +38,7 @@ database:
   elite_selection_ratio: 0.2
   exploitation_ratio: 0.7
 
-# Evaluator configuration
+# 评估器配置
 evaluator:
   timeout: 60
   cascade_evaluation: true
@@ -39,6 +46,6 @@ evaluator:
   parallel_evaluations: 4
   use_llm_feedback: false
 
-# Evolution settings
+# 进化设置
 diff_based_evolution: true
 allow_full_rewrites: false

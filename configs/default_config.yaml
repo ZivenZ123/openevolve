@@ -1,108 +1,108 @@
-# OpenEvolve Default Configuration
-# This file contains all available configuration options with sensible defaults
-# You can use this as a template for your own configuration
+# OpenEvolve 默认配置
+# 本文件包含所有可用的配置选项及其合理默认值
+# 您可以将此作为自定义配置的模板
 
-# General settings
-max_iterations: 1000                  # Maximum number of evolution iterations
-checkpoint_interval: 50               # Save checkpoints every N iterations
-log_level: "INFO"                     # Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-log_dir: null                         # Custom directory for logs (default: output_dir/logs)
-random_seed: null                     # Random seed for reproducibility (null = random)
+# 通用设置
+max_iterations: 1000 # 最大进化迭代次数
+checkpoint_interval: 50 # 每N次迭代保存检查点
+log_level: "INFO" # 日志级别(DEBUG, INFO, WARNING, ERROR, CRITICAL)
+log_dir: null # 日志自定义目录(默认: output_dir/logs)
+random_seed: null # 随机种子(用于复现, null表示随机)
 
-# Evolution settings
-diff_based_evolution: true            # Use diff-based evolution (true) or full rewrites (false)
-allow_full_rewrites: false            # Allow occasional full rewrites even in diff-based mode
-max_code_length: 10000                # Maximum allowed code length in characters
+# 进化设置
+diff_based_evolution: true # 使用基于差异的进化(true)或完全重写(false)
+allow_full_rewrites: false # 即使在差异模式下也允许偶尔完全重写
+max_code_length: 10000 # 允许的最大代码长度(字符数)
 
-# LLM configuration
+# LLM配置
 llm:
-  # Primary model (used most frequently)
+  # 主模型(最常使用)
   primary_model: "gemini-2.0-flash-lite"
-  primary_model_weight: 0.8           # Sampling weight for primary model
+  primary_model_weight: 0.8 # 主模型采样权重
 
-  # Secondary model (used for occasional high-quality generations)
+  # 辅助模型(用于偶尔的高质量生成)
   secondary_model: "gemini-2.0-flash"
-  secondary_model_weight: 0.2         # Sampling weight for secondary model
+  secondary_model_weight: 0.2 # 辅助模型采样权重
 
-  # API configuration
-  api_base: "https://generativelanguage.googleapis.com/v1beta/openai/"  # Base URL for API (change for non-OpenAI models)
-  api_key: null                       # API key (defaults to OPENAI_API_KEY env variable)
+  # API配置
+  api_base: "https://generativelanguage.googleapis.com/v1beta/openai/" # API基础URL(非OpenAI模型需修改)
+  api_key: null # API密钥(默认为OPENAI_API_KEY环境变量)
 
-  # Generation parameters
-  temperature: 0.7                    # Temperature for generation (higher = more creative)
-  top_p: 0.95                         # Top-p sampling parameter
-  max_tokens: 4096                    # Maximum tokens to generate
+  # 生成参数
+  temperature: 0.7 # 生成温度(值越高越有创造性)
+  top_p: 0.95 # Top-p采样参数
+  max_tokens: 4096 # 最大生成token数
 
-  # Request parameters
-  timeout: 60                         # Timeout for API requests in seconds
-  retries: 3                          # Number of retries for failed requests
-  retry_delay: 5                      # Delay between retries in seconds
+  # 请求参数
+  timeout: 60 # API请求超时时间(秒)
+  retries: 3 # 失败请求重试次数
+  retry_delay: 5 # 重试间隔时间(秒)
 
-# Prompt configuration
+# 提示配置
 prompt:
-  template_dir: null                  # Custom directory for prompt templates
-  system_message: "You are an expert coder helping to improve programs through evolution."
+  template_dir: null # 提示模板自定义目录
+  system_message: "你是一位专家程序员,正在通过进化帮助改进程序."
 
-  # Number of examples to include in the prompt
-  num_top_programs: 3                 # Number of top-performing programs to include
-  num_diverse_programs: 2             # Number of diverse programs to include
+  # 提示中包含的示例数量
+  num_top_programs: 3 # 包含的顶级程序数量
+  num_diverse_programs: 2 # 包含的多样化程序数量
 
-  # Template stochasticity
-  use_template_stochasticity: true    # Use random variations in templates for diversity
-  template_variations:                # Different phrasings for parts of the template
+  # 模板随机性
+  use_template_stochasticity: true # 使用模板随机变化以增加多样性
+  template_variations: # 模板部分的不同表达方式
     improvement_suggestion:
-      - "Here's how we could improve this code:"
-      - "I suggest the following improvements:"
-      - "We can enhance this code by:"
+      - "以下是改进这段代码的方法:"
+      - "我建议做以下改进:"
+      - "我们可以通过以下方式增强这段代码:"
 
-  # Meta-prompting (experimental)
-  use_meta_prompting: false           # Use LLM to generate parts of the prompt
-  meta_prompt_weight: 0.1             # Weight for meta-prompting influence
+  # 元提示(实验性功能)
+  use_meta_prompting: false # 使用LLM生成部分提示内容
+  meta_prompt_weight: 0.1 # 元提示影响的权重
 
-# Database configuration
+# 数据库配置
 database:
-  # General settings
-  db_path: null                       # Path to persist database (null = in-memory only)
-  in_memory: true                     # Keep database in memory for faster access
+  # 通用设置
+  db_path: null # 数据库持久化路径(null表示仅内存)
+  in_memory: true # 将数据库保留在内存中以加快访问速度
 
-  # Evolutionary parameters
-  population_size: 1000               # Maximum number of programs to keep in memory
-  archive_size: 100                   # Size of elite archive
-  num_islands: 5                      # Number of islands for island model
+  # 进化参数
+  population_size: 1000 # 内存中保留的最大程序数量
+  archive_size: 100 # 精英存档大小
+  num_islands: 5 # 岛屿模型中的岛屿数量
 
-  # Selection parameters
-  elite_selection_ratio: 0.1          # Ratio of elite programs to select
-  exploration_ratio: 0.2              # Ratio of exploration vs exploitation
-  exploitation_ratio: 0.7             # Ratio of exploitation vs random selection
-  diversity_metric: "edit_distance"   # Diversity metric (edit_distance, feature_based)
+  # 选择参数
+  elite_selection_ratio: 0.1 # 选择的精英程序比例
+  exploration_ratio: 0.2 # 探索与利用的比例
+  exploitation_ratio: 0.7 # 利用与随机选择的比例
+  diversity_metric: "edit_distance" # 多样性度量(edit_distance, feature_based)
 
-  # Feature map dimensions for MAP-Elites
-  feature_dimensions:                 # Dimensions for MAP-Elites feature map
-    - "score"                         # Performance score
-    - "complexity"                    # Code complexity (length)
-  feature_bins: 10                    # Number of bins per dimension
+  # MAP-Elites的特征图维度
+  feature_dimensions: # MAP-Elites特征图的维度
+    - "score" # 性能分数
+    - "complexity" # 代码复杂度(长度)
+  feature_bins: 10 # 每个维度的分箱数量
 
-# Evaluator configuration
+# 评估器配置
 evaluator:
-  # General settings
-  timeout: 300                        # Maximum evaluation time in seconds
-  max_retries: 3                      # Maximum number of retries for evaluation
+  # 通用设置
+  timeout: 300 # 最大评估时间(秒)
+  max_retries: 3 # 评估的最大重试次数
 
-  # Resource limits
-  memory_limit_mb: null               # Memory limit for evaluation (null = no limit)
-  cpu_limit: null                     # CPU limit for evaluation (null = no limit)
+  # 资源限制
+  memory_limit_mb: null # 评估的内存限制(null表示无限制)
+  cpu_limit: null # 评估的CPU限制(null表示无限制)
 
-  # Evaluation strategies
-  cascade_evaluation: true            # Use cascade evaluation to filter bad solutions early
-  cascade_thresholds:                 # Thresholds for advancing to next evaluation stage
-    - 0.5                             # First stage threshold
-    - 0.75                            # Second stage threshold
-    - 0.9                             # Third stage threshold
+  # 评估策略
+  cascade_evaluation: true # 使用级联评估提前过滤不良解决方案
+  cascade_thresholds: # 进入下一评估阶段的阈值
+    - 0.5 # 第一阶段阈值
+    - 0.75 # 第二阶段阈值
+    - 0.9 # 第三阶段阈值
 
-  # Parallel evaluation
-  parallel_evaluations: 4             # Number of parallel evaluations
-  distributed: false                  # Use distributed evaluation
+  # 并行评估
+  parallel_evaluations: 4 # 并行评估数量
+  distributed: false # 使用分布式评估
 
-  # LLM-based feedback (experimental)
-  use_llm_feedback: false             # Use LLM to evaluate code quality
-  llm_feedback_weight: 0.1            # Weight for LLM feedback in final score
+  # 基于LLM的反馈(实验性)
+  use_llm_feedback: false # 使用LLM评估代码质量
+  llm_feedback_weight: 0.1 # LLM反馈在最终分数中的权重
