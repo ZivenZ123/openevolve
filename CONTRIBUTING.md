@@ -78,7 +78,7 @@ black openevolve tests examples
 
 ## Pull Request 流程
 
-1. 为您的功能或 bug 修复创建一个新分支: `git checkout -b feature/your-feature-name`
+1. 为您的功能或 bug 修复创建一个新分支: `git checkout -b feat-your-feature-name`
 2. 进行您的修改
 3. 为您的修改添加测试
 4. 运行测试以确保一切通过: `python -m unittest discover tests`

@@ -55,9 +55,7 @@ prompt:
       - "我建议做以下改进:"
       - "我们可以通过以下方式增强这段代码:"
 
-  # 元提示(实验性功能)
-  use_meta_prompting: false # 使用LLM生成部分提示内容
-  meta_prompt_weight: 0.1 # 元提示影响的权重
+  # Note: meta-prompting features are not yet implemented
 
 # 数据库配置
 database:
@@ -65,16 +63,22 @@ database:
   db_path: null # 数据库持久化路径(null表示仅内存)
   in_memory: true # 将数据库保留在内存中以加快访问速度
 
-  # 进化参数
-  population_size: 1000 # 内存中保留的最大程序数量
-  archive_size: 100 # 精英存档大小
-  num_islands: 5 # 岛屿模型中的岛屿数量
+  # Evolutionary parameters
+  population_size: 1000 # Maximum number of programs to keep in memory
+  archive_size: 100 # Size of elite archive
+  num_islands: 5 # Number of islands for island model (separate populations)
 
-  # 选择参数
-  elite_selection_ratio: 0.1 # 选择的精英程序比例
-  exploration_ratio: 0.2 # 探索与利用的比例
-  exploitation_ratio: 0.7 # 利用与随机选择的比例
-  diversity_metric: "edit_distance" # 多样性度量(edit_distance, feature_based)
+  # Island-based evolution parameters
+  # Islands provide diversity by maintaining separate populations that evolve independently.
+  # Migration periodically shares the best solutions between adjacent islands.
+  migration_interval: 50 # Migrate between islands every N generations
+  migration_rate: 0.1 # Fraction of top programs to migrate (0.1 = 10%)
+
+  # Selection parameters
+  elite_selection_ratio: 0.1 # Ratio of elite programs to select
+  exploration_ratio: 0.2 # Ratio of exploration vs exploitation
+  exploitation_ratio: 0.7 # Ratio of exploitation vs random selection
+  # Note: diversity_metric is fixed to "edit_distance" (feature_based not implemented)
 
   # MAP-Elites的特征图维度
   feature_dimensions: # MAP-Elites特征图的维度
@@ -88,9 +92,7 @@ evaluator:
   timeout: 300 # 最大评估时间(秒)
   max_retries: 3 # 评估的最大重试次数
 
-  # 资源限制
-  memory_limit_mb: null # 评估的内存限制(null表示无限制)
-  cpu_limit: null # 评估的CPU限制(null表示无限制)
+  # Note: resource limits (memory_limit_mb, cpu_limit) are not yet implemented
 
   # 评估策略
   cascade_evaluation: true # 使用级联评估提前过滤不良解决方案
@@ -99,9 +101,9 @@ evaluator:
     - 0.75 # 第二阶段阈值
     - 0.9 # 第三阶段阈值
 
-  # 并行评估
-  parallel_evaluations: 4 # 并行评估数量
-  distributed: false # 使用分布式评估
+  # Parallel evaluation
+  parallel_evaluations: 4 # Number of parallel evaluations
+  # Note: distributed evaluation is not yet implemented
 
   # 基于LLM的反馈(实验性)
   use_llm_feedback: false # 使用LLM评估代码质量
