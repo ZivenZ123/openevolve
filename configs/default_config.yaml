@@ -16,13 +16,21 @@ max_code_length: 10000 # 允许的最大代码长度(字符数)
 
 # LLM配置
 llm:
-  # 主模型(最常使用)
-  primary_model: "gemini-2.0-flash-lite"
-  primary_model_weight: 0.8 # 主模型采样权重
+  # Models for evolution
+  models:
+    # List of available models with their weights
+    - name: "gemini-2.0-flash-lite"
+      weight: 0.8
+    - name: "gemini-2.0-flash"
+      weight: 0.2
 
-  # 辅助模型(用于偶尔的高质量生成)
-  secondary_model: "gemini-2.0-flash"
-  secondary_model_weight: 0.2 # 辅助模型采样权重
+  # Models for LLM feedback
+  evaluator_models:
+    # List of available models with their weights
+    - name: "gemini-2.0-flash-lite"
+      weight: 0.8
+    - name: "gemini-2.0-flash"
+      weight: 0.2
 
   # API配置
   api_base: "https://generativelanguage.googleapis.com/v1beta/openai/" # API基础URL(非OpenAI模型需修改)
@@ -40,8 +48,9 @@ llm:
 
 # 提示配置
 prompt:
-  template_dir: null # 提示模板自定义目录
-  system_message: "你是一位专家程序员,正在通过进化帮助改进程序."
+  template_dir: null # Custom directory for prompt templates
+  system_message: "You are an expert coder helping to improve programs through evolution."
+  evaluator_system_message: "You are an expert code reviewer."
 
   # 提示中包含的示例数量
   num_top_programs: 3 # 包含的顶级程序数量

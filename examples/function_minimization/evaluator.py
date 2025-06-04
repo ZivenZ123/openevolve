@@ -2,11 +2,11 @@
 函数最小化示例的评估器
 """
 
+import concurrent.futures
 import importlib.util
-import multiprocessing
+import signal
 import time
 import traceback
-from typing import Any, Callable
 
 import numpy as np
 
@@ -29,38 +29,15 @@ def run_with_timeout(
     Returns:
         函数结果或抛出TimeoutError
     """
-
-    def wrapper(
-        queue: multiprocessing.Queue,
-        func: Callable,
-        args: tuple,
-        kwargs: dict,
-    ) -> None:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(func, *args, **kwargs)
         try:
-            result = func(*args, **kwargs)
-            queue.put(("success", result))
-        except Exception as e:
-            queue.put(("error", e))
-
-    queue: multiprocessing.Queue = multiprocessing.Queue()
-    process = multiprocessing.Process(
-        target=wrapper, args=(queue, func, args, kwargs)
-    )
-    process.start()
-    process.join(timeout=timeout_seconds)
-
-    if process.is_alive():
-        process.terminate()
-        process.join()
-        raise TimeoutError(f"函数在{timeout_seconds}秒后超时")
-
-    if queue.empty():
-        raise TimeoutError("函数结束但未返回结果")
-
-    status, result = queue.get()
-    if status == "error":
-        raise result
-    return result
+            result = future.result(timeout=timeout_seconds)
+            return result
+        except concurrent.futures.TimeoutError:
+            raise TimeoutError(
+                f"Function timed out after {timeout_seconds} seconds"
+            )
 
 
 def safe_float(value: Any) -> float:
@@ -122,14 +99,32 @@ def evaluate(program_path: str) -> dict[str, Any]:
                     program.run_search, timeout_seconds=5
                 )
 
-                # 检查是否得到3个值的元组
-                if not isinstance(result, tuple) or len(result) != 3:
+                # Handle different result formats
+                if isinstance(result, tuple):
+                    if len(result) == 3:
+                        x, y, value = result
+                    elif len(result) == 2:
+                        # Assume it's (x, y) and calculate value
+                        x, y = result
+                        # Calculate the function value since it wasn't returned
+                        value = (
+                            np.sin(x) * np.cos(y)
+                            + np.sin(x * y)
+                            + (x**2 + y**2) / 20
+                        )
+                        print(
+                            f"Trial {trial}: Got 2 values, calculated function value: {value}"
+                        )
+                    else:
+                        print(
+                            f"Trial {trial}: Invalid result format, expected tuple of 2 or 3 values but got {len(result)}"
+                        )
+                        continue
+                else:
                     print(
-                        f"试验{trial}: 结果格式无效, 期望3个值的元组但得到{type(result)}"
+                        f"Trial {trial}: Invalid result format, expected tuple but got {type(result)}"
                     )
                     continue
-
-                x, y, value = result
 
                 end_time = time.time()
 
@@ -284,19 +279,40 @@ def evaluate_stage1(program_path: str) -> dict[str, Any]:
             # 运行单次试验(带超时)
             result = run_with_timeout(program.run_search, timeout_seconds=5)
 
-            # 检查是否返回3个值的元组
-            if not isinstance(result, tuple) or len(result) != 3:
+            # Handle different result formats
+            if isinstance(result, tuple):
+                if len(result) == 3:
+                    x, y, value = result
+                elif len(result) == 2:
+                    # Assume it's (x, y) and calculate value
+                    x, y = result
+                    # Calculate the function value since it wasn't returned
+                    value = (
+                        np.sin(x) * np.cos(y)
+                        + np.sin(x * y)
+                        + (x**2 + y**2) / 20
+                    )
+                    print(
+                        f"Stage 1: Got 2 values, calculated function value: {value}"
+                    )
+                else:
+                    print(
+                        f"Stage 1: Invalid result format, expected tuple of 2 or 3 values but got {len(result)}"
+                    )
+                    return {
+                        "runs_successfully": 0.0,
+                        "error": "Invalid result format",
+                    }
+            else:
                 print(
-                    f"阶段1: 无效结果格式, 期望3个值的元组但得到{type(result)}"
+                    f"Stage 1: Invalid result format, expected tuple but got {type(result)}"
                 )
                 return {
                     "runs_successfully": 0.0,
-                    "error": "无效结果格式",
+                    "error": "Invalid result format",
                 }
 
-            x, y, value = result
-
-            # 确保所有值都是float类型
+            # Ensure all values are float
             x = safe_float(x)
             y = safe_float(y)
             value = safe_float(value)
